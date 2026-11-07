@@ -10,11 +10,35 @@ cmake --build build
 cmake --build build && cmake --install build --prefix ~/.local
 ```
 
+## Install
+
+Install for the current user into `~/.local/bin` (make sure it is on your `PATH`):
+
+```bash
+cmake --install build --prefix ~/.local
+```
+
+Or system-wide into `/usr/local/bin`:
+
+```bash
+sudo cmake --install build
+```
+
 ## Run
 
 ```bash
-./build/wallmenu
+wallmenu            # if installed
+./build/wallmenu    # from the build directory
 ```
+
+## Wallpaper backends
+
+The backend is chosen from `XDG_CURRENT_DESKTOP`:
+
+- **KDE Plasma**: `plasma-apply-wallpaperimage` (Plasma 5.24+ / 6), falling back to a
+  Plasma script via `qdbus6` / `qdbus`
+- **Sway**: `swaymsg output * bg <image> fill`
+- **Anything else**: `feh --bg-fill` (X11 only)
 
 ## Keyboard shortcuts
 
