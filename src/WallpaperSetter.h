@@ -9,6 +9,7 @@ public:
 
 private:
     static bool setForKde(const QString& imagePath, QString* errorMessage);
+    static bool setForKdeWithScript(const QString& qdbusProgram, const QString& imagePath, QString* errorMessage);
     static bool setForSway(const QString& imagePath, QString* errorMessage);
     static bool setWithFeh(const QString& imagePath, QString* errorMessage);
     static bool runCommand(const QString& program, const QStringList& args, QString* errorMessage);
