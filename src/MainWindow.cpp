@@ -70,7 +70,7 @@ MainWindow::MainWindow(Config::Data config, QWidget* parent)
 
 void MainWindow::buildUi() {
     setWindowTitle("Wallmenu");
-    resize(1080, 680);
+    resize(1600, 960);
 
     auto* splitter = new QSplitter(Qt::Horizontal, this);
 

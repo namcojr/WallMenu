@@ -7,6 +7,7 @@ Minimal wallpaper picker for Linux built with Qt6 Widgets and C++20.
 ```bash
 cmake -S . -B build
 cmake --build build
+cmake --build build && cmake --install build --prefix ~/.local
 ```
 
 ## Run

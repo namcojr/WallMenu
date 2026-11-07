@@ -1,6 +1,7 @@
 #include "WallpaperSetter.h"
 
 #include <QProcess>
+#include <QStandardPaths>
 
 namespace {
 QString escapeForJs(const QString& input) {
@@ -53,16 +54,33 @@ bool WallpaperSetter::setForKde(const QString& imagePath, QString* errorMessage)
         "}"
     );
 
-    return runCommand(
-        "qdbus",
-        {
-            "org.kde.plasmashell",
-            "/PlasmaShell",
-            "org.kde.PlasmaShell.evaluateScript",
-            script,
-        },
-        errorMessage
-    );
+    // Plasma ships a dedicated CLI for this; prefer it.
+    if (!QStandardPaths::findExecutable("plasma-apply-wallpaperimage").isEmpty()) {
+        if (runCommand("plasma-apply-wallpaperimage", {imagePath}, errorMessage)) {
+            return true;
+        }
+    }
+
+    // Fall back to the scripting API. The qdbus binary name differs per distro/Qt version.
+    const QStringList dbusArgs = {
+        "org.kde.plasmashell",
+        "/PlasmaShell",
+        "org.kde.PlasmaShell.evaluateScript",
+        script,
+    };
+    for (const QString& qdbus : {QStringLiteral("qdbus6"), QStringLiteral("qdbus-qt6"), QStringLiteral("qdbus")}) {
+        if (QStandardPaths::findExecutable(qdbus).isEmpty()) {
+            continue;
+        }
+        if (runCommand(qdbus, dbusArgs, errorMessage)) {
+            return true;
+        }
+    }
+
+    if (errorMessage != nullptr && errorMessage->isEmpty()) {
+        *errorMessage = "KDE detected, but neither plasma-apply-wallpaperimage nor qdbus6/qdbus was found.";
+    }
+    return false;
 }
 
 bool WallpaperSetter::setForSway(const QString& imagePath, QString* errorMessage) {
@@ -76,16 +94,21 @@ bool WallpaperSetter::setWithFeh(const QString& imagePath, QString* errorMessage
 bool WallpaperSetter::setWallpaper(const QString& imagePath, QString* errorMessage) {
     const QString desktop = qEnvironmentVariable("XDG_CURRENT_DESKTOP").toLower();
 
+    // Report the error from the desktop-specific setter rather than a misleading feh failure.
     if (desktop.contains("kde")) {
-        if (setForKde(imagePath, errorMessage)) {
-            return true;
-        }
+        return setForKde(imagePath, errorMessage);
     }
 
     if (desktop.contains("sway")) {
-        if (setForSway(imagePath, errorMessage)) {
-            return true;
+        return setForSway(imagePath, errorMessage);
+    }
+
+    // feh only works on X11.
+    if (qEnvironmentVariable("XDG_SESSION_TYPE") == "wayland") {
+        if (errorMessage != nullptr) {
+            *errorMessage = QString("Unsupported Wayland desktop: %1").arg(desktop.isEmpty() ? "unknown" : desktop);
         }
+        return false;
     }
 
     return setWithFeh(imagePath, errorMessage);

@@ -28,3 +28,6 @@ target_link_libraries(wallmenu PRIVATE
     Qt6::Widgets
     Qt6::Concurrent
 )
+
+include(GNUInstallDirs)
+install(TARGETS wallmenu RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
