@@ -24,6 +24,9 @@ Or system-wide into `/usr/local/bin`:
 sudo cmake --install build
 ```
 
+Both also install a `wallmenu.desktop` entry into `share/applications` under the prefix,
+so wallmenu appears in application launchers such as rofi.
+
 ## Run
 
 ```bash

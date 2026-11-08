@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Wallmenu
+GenericName=Wallpaper Picker
+Comment=Browse images and set the desktop wallpaper
+TryExec=@WALLMENU_EXECUTABLE@
+Exec=@WALLMENU_EXECUTABLE@
+Icon=preferences-desktop-wallpaper
+Terminal=false
+StartupNotify=false
+Categories=Qt;Settings;DesktopSettings;
+Keywords=wallpaper;background;desktop;image;

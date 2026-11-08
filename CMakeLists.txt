@@ -31,3 +31,16 @@ target_link_libraries(wallmenu PRIVATE
 
 include(GNUInstallDirs)
 install(TARGETS wallmenu RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Generated at install time so Exec honours `cmake --install --prefix`. The path
+# is absolute because desktop sessions often lack ~/.local/bin on PATH.
+install(CODE "
+    set(WALLMENU_EXECUTABLE \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/wallmenu\")
+    configure_file(
+        \"${CMAKE_CURRENT_SOURCE_DIR}/wallmenu.desktop.in\"
+        \"${CMAKE_CURRENT_BINARY_DIR}/wallmenu.desktop\"
+        @ONLY
+    )
+")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wallmenu.desktop"
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
